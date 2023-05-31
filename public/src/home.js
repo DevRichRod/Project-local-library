@@ -29,13 +29,14 @@ function getBooksBorrowedCount(books) {
 
 function getMostCommonGenres(books) {
   const genresOfBooks = books.map((book) => book.genre);
-  fiveCommonGenres = [];
-  genresOfBooks.map((genre) => {const location = fiveCommonGenres.findIndex((element) => element.name === genre);
-    if (location >= 0) { fiveCommonGenres[location].count = fiveCommonGenres[location].count + 1;
-    } else { 
-      fiveCommonGenres.push({ name: genre, count: 1 }); } });
-      fiveCommonGenres.sort((a, b) => b.count - a.count); if (fiveCommonGenres.length > 5) { return fiveCommonGenres.slice(0, 5); }
-    return fiveCommonGenres;
+  const genres = {};
+  for (const genre of genresOfBooks){
+    if (genres[genre] === undefined){
+      genres[genre] = {name: genre, count: 0}
+    }
+    genres[genre].count++
+  }
+  return Object.values(genres).sort((a, b) => b.count - a.count).slice(0, 5)
 }
 
 function getMostPopularBooks(books) {
@@ -48,9 +49,13 @@ function getMostPopularAuthors(books, authors) {
   for (let author of authors) {
     const authorName = `${author.name.first} ${author.name.last}`;
     let count = 0; 
-    for (let book of books) { if (author.id === book.authorId) { 
-      count += book.borrows.length; } }
-    const authorObject = { name: authorName, count: count }; popularAuthors.push(authorObject); 
+    for (let book of books) { 
+      if (author.id === book.authorId) { 
+        count += book.borrows.length; 
+      } 
+    }
+    const authorObject = { name: authorName, count: count };
+    popularAuthors.push(authorObject); 
   }
     return sortByPopularity(popularAuthors).slice(0,5)
 }
